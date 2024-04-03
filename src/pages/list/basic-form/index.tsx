@@ -42,7 +42,7 @@ const BasicForm: FC<Record<string, any>> = () => {
           </div>
           <ProFormText
             width="md"
-            label="文件名称"
+            label="模型名称"
             name="title"
             rules={[
               {
@@ -50,7 +50,7 @@ const BasicForm: FC<Record<string, any>> = () => {
                 message: '请输入标题',
               },
             ]}
-            placeholder="给文件起个名字"
+            placeholder="请输入模型名称"
           />
           {/* <ProFormDateRangePicker
             label="起止日期"
@@ -66,7 +66,7 @@ const BasicForm: FC<Record<string, any>> = () => {
           /> */}
           <ProFormText
             width="md"
-            label="数据描述"
+            label="模型描述"
             name="title"
             rules={[
               {
@@ -74,7 +74,7 @@ const BasicForm: FC<Record<string, any>> = () => {
                 message: '请输入标题',
               },
             ]}
-            placeholder="请输入数据描述"
+            placeholder="请输入模型描述"
           />
           {/* <ProFormTextArea
             label="数据描述"

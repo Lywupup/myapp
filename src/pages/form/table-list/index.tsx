@@ -96,9 +96,9 @@ const TableList: React.FC = () => {
 
   const columns: ProColumns<TableListItem>[] = [
     {
-      title: '规则名称',
+      title: '数据文件名',
       dataIndex: 'name',
-      tip: '规则名称是唯一的 key',
+      // tip: '规则名称是唯一的 key',
       render: (dom, entity) => {
         return (
           <a
@@ -113,42 +113,42 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '描述',
+      title: '数据描述',
       dataIndex: 'desc',
       valueType: 'textarea',
     },
     {
-      title: '服务调用次数',
+      title: '数据调用次数',
       dataIndex: 'callNo',
       sorter: true,
       hideInForm: true,
       renderText: (val: string) => `${val}`,
     },
+    // {
+    //   title: '状态',
+    //   dataIndex: 'status',
+    //   hideInForm: true,
+    //   valueEnum: {
+    //     0: {
+    //       text: '关闭',
+    //       status: 'Default',
+    //     },
+    //     1: {
+    //       text: '运行中',
+    //       status: 'Processing',
+    //     },
+    //     2: {
+    //       text: '已上线',
+    //       status: 'Success',
+    //     },
+    //     3: {
+    //       text: '异常',
+    //       status: 'Error',
+    //     },
+    //   },
+    // },
     {
-      title: '状态',
-      dataIndex: 'status',
-      hideInForm: true,
-      valueEnum: {
-        0: {
-          text: '关闭',
-          status: 'Default',
-        },
-        1: {
-          text: '运行中',
-          status: 'Processing',
-        },
-        2: {
-          text: '已上线',
-          status: 'Success',
-        },
-        3: {
-          text: '异常',
-          status: 'Error',
-        },
-      },
-    },
-    {
-      title: '上次调度时间',
+      title: '上次更新时间',
       sorter: true,
       dataIndex: 'updatedAt',
       valueType: 'dateTime',
@@ -190,7 +190,7 @@ const TableList: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<TableListItem, TableListPagination>
-        headerTitle="查询表格"
+        headerTitle="数据列表"
         actionRef={actionRef}
         rowKey="key"
         search={{

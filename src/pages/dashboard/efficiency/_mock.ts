@@ -1,12 +1,19 @@
-import dayjs from 'dayjs';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { parse } from 'url';
+import type { TableListItem, TableListParams } from './data.d';
 
+// const modelList = ['LSTM', 'ConvLSTM', 'LSTNet', 'CNN', 'ELM', 'RBF', 'BP'];
+const modelList = [
+  '农作物秸秆厌氧消化数据',
+  '餐厨垃圾厌氧消化数据',
+  'Energy Efficiency数据集',
+  'Concrete Compressive Strength数据集',
+];
 // mock tableListDataSource
 const genList = (current: number, pageSize: number) => {
-  const tableListDataSource: API.RuleListItem[] = [];
+  const tableListDataSource: TableListItem[] = [];
 
-  for (let i = 0; i < pageSize; i += 1) {
+  for (let i = 0; i < modelList.length; i += 1) {
     const index = (current - 1) * 10 + i;
     tableListDataSource.push({
       key: index,
@@ -16,13 +23,13 @@ const genList = (current: number, pageSize: number) => {
         'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
         'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png',
       ][i % 2],
-      name: `TradeCode111 ${index}`,
+      name: modelList[i],
       owner: '曲丽丽',
-      desc: '这是一段描述',
+      desc: '产量预测',
       callNo: Math.floor(Math.random() * 1000),
-      status: Math.floor(Math.random() * 10) % 4,
-      updatedAt: dayjs().format('YYYY-MM-DD'),
-      createdAt: dayjs().format('YYYY-MM-DD'),
+      status: (Math.floor(Math.random() * 10) % 4).toString(),
+      updatedAt: new Date(),
+      createdAt: new Date(),
       progress: Math.ceil(Math.random() * 100),
     });
   }
@@ -38,32 +45,26 @@ function getRule(req: Request, res: Response, u: string) {
     realUrl = req.url;
   }
   const { current = 1, pageSize = 10 } = req.query;
-  const params = parse(realUrl, true).query as unknown as API.PageParams &
-    API.RuleListItem & {
-      sorter: any;
-      filter: any;
-    };
+  const params = parse(realUrl, true).query as unknown as TableListParams;
 
   let dataSource = [...tableListDataSource].slice(
     ((current as number) - 1) * (pageSize as number),
     (current as number) * (pageSize as number),
   );
   if (params.sorter) {
-    const sorter = JSON.parse(params.sorter);
-    dataSource = dataSource.sort((prev, next) => {
+    const sorter = JSON.parse(params.sorter as any);
+    dataSource = dataSource.sort((prev: any, next: any) => {
       let sortNumber = 0;
-      (Object.keys(sorter) as Array<keyof API.RuleListItem>).forEach((key) => {
-        let nextSort = next?.[key] as number;
-        let preSort = prev?.[key] as number;
+      Object.keys(sorter).forEach((key) => {
         if (sorter[key] === 'descend') {
-          if (preSort - nextSort > 0) {
+          if (prev[key] - next[key] > 0) {
             sortNumber += -1;
           } else {
             sortNumber += 1;
           }
           return;
         }
-        if (preSort - nextSort > 0) {
+        if (prev[key] - next[key] > 0) {
           sortNumber += 1;
         } else {
           sortNumber += -1;
@@ -73,16 +74,14 @@ function getRule(req: Request, res: Response, u: string) {
     });
   }
   if (params.filter) {
-    const filter = JSON.parse(params.filter as any) as {
-      [key: string]: string[];
-    };
+    const filter = JSON.parse(params.filter as any) as Record<string, string[]>;
     if (Object.keys(filter).length > 0) {
       dataSource = dataSource.filter((item) => {
-        return (Object.keys(filter) as Array<keyof API.RuleListItem>).some((key) => {
+        return Object.keys(filter).some((key) => {
           if (!filter[key]) {
             return true;
           }
-          if (filter[key].includes(`${item[key]}`)) {
+          if (filter[key].includes(`${item[key as 'status']}`)) {
             return true;
           }
           return false;
@@ -92,14 +91,20 @@ function getRule(req: Request, res: Response, u: string) {
   }
 
   if (params.name) {
-    dataSource = dataSource.filter((data) => data?.name?.includes(params.name || ''));
+    dataSource = dataSource.filter((data) => data.name.includes(params.name || ''));
   }
+
+  let finalPageSize = 10;
+  if (params.pageSize) {
+    finalPageSize = parseInt(`${params.pageSize}`, 10);
+  }
+
   const result = {
     data: dataSource,
     total: tableListDataSource.length,
     success: true,
-    pageSize,
-    current: parseInt(`${params.current}`, 10) || 1,
+    pageSize: finalPageSize,
+    current: parseInt(`${params.currentPage}`, 10) || 1,
   };
 
   return res.json(result);
@@ -112,17 +117,17 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
   }
 
   const body = (b && b.body) || req.body;
-  const { method, name, desc, key } = body;
+  const { name, desc, key } = body;
 
-  switch (method) {
+  switch (req.method) {
     /* eslint no-case-declarations:0 */
-    case 'delete':
+    case 'DELETE':
       tableListDataSource = tableListDataSource.filter((item) => key.indexOf(item.key) === -1);
       break;
-    case 'post':
+    case 'POST':
       (() => {
         const i = Math.ceil(Math.random() * 10000);
-        const newRule: API.RuleListItem = {
+        const newRule = {
           key: tableListDataSource.length,
           href: 'https://ant.design',
           avatar: [
@@ -133,9 +138,9 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
           owner: '曲丽丽',
           desc,
           callNo: Math.floor(Math.random() * 1000),
-          status: Math.floor(Math.random() * 10) % 2,
-          updatedAt: dayjs().format('YYYY-MM-DD'),
-          createdAt: dayjs().format('YYYY-MM-DD'),
+          status: (Math.floor(Math.random() * 10) % 2).toString(),
+          updatedAt: new Date(),
+          createdAt: new Date(),
           progress: Math.ceil(Math.random() * 100),
         };
         tableListDataSource.unshift(newRule);
@@ -143,7 +148,7 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
       })();
       return;
 
-    case 'update':
+    case 'PUT':
       (() => {
         let newRule = {};
         tableListDataSource = tableListDataSource.map((item) => {
@@ -173,4 +178,6 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
 export default {
   'GET /api/rule': getRule,
   'POST /api/rule': postRule,
+  'DELETE /api/rule': postRule,
+  'PUT /api/rule': postRule,
 };

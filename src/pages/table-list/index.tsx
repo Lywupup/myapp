@@ -49,7 +49,7 @@ const TableList: React.FC = () => {
         />
       ),
       dataIndex: 'name',
-      tip: 'The rule name is the unique key',
+      // tip: 'The rule name is the unique key',
       render: (dom, entity) => {
         return (
           <a
@@ -81,7 +81,7 @@ const TableList: React.FC = () => {
       renderText: (val: string) =>
         `${val}${intl.formatMessage({
           id: 'pages.searchTable.tenThousand',
-          defaultMessage: ' 万 ',
+          defaultMessage: '  ',
         })}`,
     },
     {

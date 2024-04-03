@@ -2,11 +2,18 @@ import type { Request, Response } from 'express';
 import { parse } from 'url';
 import type { TableListItem, TableListParams } from './data.d';
 
+const modelList = ['LSTM', 'ConvLSTM', 'LSTNet', 'CNN', 'ELM', 'RBF', 'BP'];
+// const modelList = [
+//   '农作物秸秆厌氧消化数据',
+//   '餐厨垃圾厌氧消化数据',
+//   'Energy Efficiency数据集',
+//   'Concrete Compressive Strength数据集',
+// ];
 // mock tableListDataSource
 const genList = (current: number, pageSize: number) => {
   const tableListDataSource: TableListItem[] = [];
 
-  for (let i = 0; i < pageSize; i += 1) {
+  for (let i = 0; i < modelList.length; i += 1) {
     const index = (current - 1) * 10 + i;
     tableListDataSource.push({
       key: index,
@@ -16,9 +23,10 @@ const genList = (current: number, pageSize: number) => {
         'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
         'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png',
       ][i % 2],
-      name: `TradeCode ${index}`,
+      name: modelList[i],
       owner: '曲丽丽',
-      desc: '这是一段描述',
+      desc: '产量预测',
+      // desc: '原始数据集',
       callNo: Math.floor(Math.random() * 1000),
       status: (Math.floor(Math.random() * 10) % 4).toString(),
       updatedAt: new Date(),
